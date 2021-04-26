@@ -21,23 +21,23 @@ const Container = styled.div`
     font-size: 36px;
     line-height: 54px;
     top: -48px;
-    left: 0px;
+    left: 0;
     text-transform: uppercase;
     color: #f2f2f2;
   }
   .adventure {
     position: absolute;
-    top: -72px;
-    left: 302px;
+    top: -60px;
+    right: 0;
   }
 `;
 
 const QuestionBox = styled.div`
   position: absolute;
-  width: 464px;
-  height: 540px;
-  left: 35%;
-  top: 15%;
+  width: ${props => (props.showResult ? "30%" : "60%")};
+  height: ${props => (props.showResult ? "60%" : "fit-content%")};
+  left: ${props => (props.showResult ? "35%" : "20%")};
+  top: ${props => (props.showResult ? "20%" : "10%")};
   border-radius: 24px;
   background-color: #ffffff;
   p {
@@ -50,16 +50,14 @@ const QuestionBox = styled.div`
     margin-top: ${props => (props.questionType === 0 ? "68px" : "68px")};
     margin-left: 32px;
   }
-  p + div {
-    margin: 32px 32px 25px 32px;
-  }
-  div + div {
-    margin: 25px 32px;
+
+  .question-field {
+    margin: 25px 5%;
   }
   img {
     position: absolute;
-    top: 100px;
-    left: 100px;
+    top: 68px;
+    right: 5%;
     width: 84px;
     height: 54px;
   }
@@ -67,9 +65,7 @@ const QuestionBox = styled.div`
     display: flex;
     justify-content: flex-start;
     width: 116px;
-    margin: -20px 32px 0px auto;
-    margin: ${props =>
-      props.questionType === 1 ? "-20px 32px 0px auto" : "0px 32px 0px auto"};
+    margin: 0px 5% 2% auto;
     padding: 15px 36px;
     background-color: #f9a826;
     box-shadow: 0px 2px 4px rgba(252, 168, 47, 0.4);
@@ -88,9 +84,9 @@ const QuestionBox = styled.div`
 
   .results-svg {
     display: block;
-    width: 238px;
-    height: 128px;
-    margin: 49px auto 72px auto;
+    width: 70%;
+    height: 40%;
+    margin: 0px auto 10% auto;
   }
   .results-text {
     display: block;
@@ -103,7 +99,7 @@ const QuestionBox = styled.div`
     text-align: center;
   }
   .results-number {
-    margin: 0px 0px 71px 0px;
+    margin: 0px 0px 10% 0px;
     font-family: Poppins;
     font-style: normal;
     font-weight: normal;
@@ -121,8 +117,8 @@ const QuestionBox = styled.div`
     display: block;
     margin-left: auto;
     margin-right: auto;
-    width: 209px;
-    height: 62px;
+    width: 40%;
+    height: 15%;
     background-color: #ffffff;
     border: 2px solid #1d355d;
     box-sizing: border-box;
@@ -216,11 +212,11 @@ const QuestionCard = () => {
       <Container>
         {isLoading && <h1 className="Loading-text">Loading ...</h1>}
         {!isLoading && !showResult && (
-          <QuestionBox questionType={questionType}>
+          <QuestionBox showResult={showResult} questionType={questionType}>
             <h1 className="country-quiz-text">Country Quiz</h1>
             <Adventure className="adventure" />
             {questions.length > 0 && questionType === 0 && (
-              <p>
+              <p className="question">
                 {
                   questions.filter(item => item.correctAnswer === true)[0]
                     .capital
@@ -237,7 +233,9 @@ const QuestionCard = () => {
                   }
                   alt=""
                 ></img>
-                <p>Which country does this flag belong to?</p>
+                <p className="question">
+                  Which country does this flag belong to?
+                </p>
               </>
             )}
             {questions.map((item, index) => (
@@ -260,7 +258,7 @@ const QuestionCard = () => {
         )}
 
         {showResult && (
-          <QuestionBox questionType={questionType}>
+          <QuestionBox showResult={showResult} questionType={questionType}>
             <h1 className="country-quiz-text">Country Quiz</h1>
             <Results className="results-svg"></Results>
             <h2 className="results-text">Results</h2>

@@ -2,7 +2,7 @@ import styled, { css } from "styled-components";
 import CheckCircleOutlineOutlinedIcon from "@material-ui/icons/CheckCircleOutlineOutlined";
 import HighlightOffIcon from "@material-ui/icons/HighlightOff";
 const Field = styled.div`
-  width: 400px;
+  width: 90%;
   height: 56px;
   background-color: ${props =>
     !props.isAnswered
@@ -20,10 +20,9 @@ const Field = styled.div`
   display: flex;
   justify-content: start;
   cursor: pointer;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  span {
+  .country,
+  .position {
+    display: inline-block;
     font-family: Poppins;
     font-style: normal;
     font-weight: 500;
@@ -34,10 +33,10 @@ const Field = styled.div`
         ? "#ffffff"
         : "rgba(96, 102, 208, 0.8)"};
   }
-  span:first-child {
+  .position {
     margin-left: 19px;
   }
-  span:nth-child(2) {
+  .country {
     margin-left: 47px;
   }
   svg {
@@ -50,7 +49,7 @@ const Field = styled.div`
     !props.isAnswered &&
     css`
       &:hover {
-        overflow: visible;
+        /* overflow: visible; */
         cursor: pointer;
         background-color: #f9a826;
         border: none;
@@ -70,19 +69,18 @@ const QuestionField = ({
   onClick,
 }) => {
   return (
-    <>
-      <Field
-        onClick={onClick}
-        correctAnswer={correctAnswer}
-        clicked={clicked}
-        isAnswered={isAnswered}
-      >
-        <span>{position}</span>
-        <span>{country.slice(0, 30)}</span>
-        {isAnswered && correctAnswer && <CheckCircleOutlineOutlinedIcon />}
-        {isAnswered && clicked && !correctAnswer && <HighlightOffIcon />}
-      </Field>
-    </>
+    <Field
+      className="question-field"
+      onClick={onClick}
+      correctAnswer={correctAnswer}
+      clicked={clicked}
+      isAnswered={isAnswered}
+    >
+      <div className="position">{position}</div>
+      <div className="country">{country}</div>
+      {isAnswered && correctAnswer && <CheckCircleOutlineOutlinedIcon />}
+      {isAnswered && clicked && !correctAnswer && <HighlightOffIcon />}
+    </Field>
   );
 };
 
