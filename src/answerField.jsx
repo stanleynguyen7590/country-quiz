@@ -59,7 +59,7 @@ const Field = styled.div`
     `}
 `;
 
-const QuestionField = ({
+const AnswerField = ({
   position,
   country,
   isAnswered,
@@ -83,4 +83,4 @@ const QuestionField = ({
   );
 };
 
-export default QuestionField;
+export default AnswerField;

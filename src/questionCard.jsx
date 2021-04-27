@@ -5,7 +5,7 @@ import _ from "lodash";
 import { ReactComponent as Adventure } from "./assets/img/undraw_adventure_4hum 1.svg";
 import { ReactComponent as Results } from "./assets/img/undraw_winners_ao2o_2.svg";
 import { useState, useEffect } from "react";
-import QuestionField from "./questionField";
+import AnswerField from "./answerField";
 const Container = styled.div`
   background-image: url(${background});
   background-position: center;
@@ -144,7 +144,7 @@ const QuestionCard = () => {
   const [isFinished, setIsFinished] = useState(false);
   const [showResult, setShowResult] = useState(false);
   const [questionType, setQuestionType] = useState(_.random(1));
-  const [correctNum, setCorrectNum] = useState(0);
+  const [numberOfCorrectAnswers, setNumberOfCorrectAnswers] = useState(0);
 
   useEffect(() => {
     const fetchNations = async () => {
@@ -186,12 +186,12 @@ const QuestionCard = () => {
       setIsFinished(true);
   };
 
-  const getNextQuestions = () => {
+  const getNextQuestion = () => {
     setQuestionType(_.random(1));
     if (!isFinished) {
       setQuestions(c => getQuestions(allNations));
       setIsQuestionAnswered(false);
-      setCorrectNum(c => c + 1);
+      setNumberOfCorrectAnswers(c => c + 1);
     } else {
       setShowResult(true);
     }
@@ -202,8 +202,9 @@ const QuestionCard = () => {
     setIsQuestionAnswered(false);
     setIsFinished(false);
     setShowResult(false);
-    setCorrectNum(0);
+    setNumberOfCorrectAnswers(0);
   };
+
   const getCorrectAnswer = questions =>
     questions.filter(item => item.correctAnswer === true)[0];
 
@@ -225,6 +226,21 @@ const QuestionCard = () => {
       }
     }
   };
+  const renderResult = () => (
+    <QuestionBox showResult={showResult} questionType={questionType}>
+      <h1 className="country-quiz-text">Country Quiz</h1>
+      <Results className="results-svg"></Results>
+      <h2 className="results-text">Results</h2>
+      <p className="results-number">
+        You got{" "}
+        <span className="results-number-text">{numberOfCorrectAnswers}</span>{" "}
+        correct answers
+      </p>
+      <button className="results-try-button" onClick={handleReset}>
+        Try again
+      </button>
+    </QuestionBox>
+  );
 
   return (
     <Container>
@@ -235,7 +251,7 @@ const QuestionCard = () => {
           <Adventure className="adventure" />
           {renderQuestion(questions, questionType)}
           {questions.map((item, index) => (
-            <QuestionField
+            <AnswerField
               key={item.id}
               onClick={() => handleClick(index)}
               position={item.position}
@@ -243,30 +259,17 @@ const QuestionCard = () => {
               clicked={item.clicked}
               isAnswered={isQuestionAnswered}
               correctAnswer={item.correctAnswer}
-            ></QuestionField>
+            ></AnswerField>
           ))}
           {isQuestionAnswered && (
-            <div onClick={() => getNextQuestions()} className="next-button">
+            <div onClick={() => getNextQuestion()} className="next-button">
               <p>Next</p>
             </div>
           )}
         </QuestionBox>
       )}
 
-      {showResult && (
-        <QuestionBox showResult={showResult} questionType={questionType}>
-          <h1 className="country-quiz-text">Country Quiz</h1>
-          <Results className="results-svg"></Results>
-          <h2 className="results-text">Results</h2>
-          <p className="results-number">
-            You got <span className="results-number-text">{correctNum}</span>{" "}
-            correct answers
-          </p>
-          <button className="results-try-button" onClick={handleReset}>
-            Try again
-          </button>
-        </QuestionBox>
-      )}
+      {showResult && renderResult()}
     </Container>
   );
 };
