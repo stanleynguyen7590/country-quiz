@@ -49,7 +49,6 @@ const Field = styled.div`
     !props.isAnswered &&
     css`
       &:hover {
-        /* overflow: visible; */
         cursor: pointer;
         background-color: #f9a826;
         border: none;

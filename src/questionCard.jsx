@@ -35,9 +35,9 @@ const Container = styled.div`
 const QuestionBox = styled.div`
   position: absolute;
   width: ${props => (props.showResult ? "30%" : "60%")};
-  height: ${props => (props.showResult ? "60%" : "fit-content%")};
+  height: ${props => (props.showResult ? "80%" : "fit-content")};
   left: ${props => (props.showResult ? "35%" : "20%")};
-  top: ${props => (props.showResult ? "20%" : "10%")};
+  top: ${props => (props.showResult ? "10%" : "20%")};
   border-radius: 24px;
   background-color: #ffffff;
   p {
@@ -145,8 +145,8 @@ const QuestionCard = () => {
   const [showResult, setShowResult] = useState(false);
   const [questionType, setQuestionType] = useState(_.random(1));
   const [correctNum, setCorrectNum] = useState(0);
+
   useEffect(() => {
-    console.log("fetch nations");
     const fetchNations = async () => {
       const result = await axios("https://restcountries.eu/rest/v2/all");
       const allNations = result.data.map((item, index) => ({
@@ -159,8 +159,6 @@ const QuestionCard = () => {
     };
     fetchNations();
     setIsLoading(false);
-    //Load Questions for the first time
-    setQuestions(c => getQuestions(allNations));
   }, []);
 
   const getQuestions = nations => {
@@ -206,73 +204,70 @@ const QuestionCard = () => {
     setShowResult(false);
     setCorrectNum(0);
   };
-  return (
-    <>
-      {console.log("rendered!")}
-      <Container>
-        {isLoading && <h1 className="Loading-text">Loading ...</h1>}
-        {!isLoading && !showResult && (
-          <QuestionBox showResult={showResult} questionType={questionType}>
-            <h1 className="country-quiz-text">Country Quiz</h1>
-            <Adventure className="adventure" />
-            {questions.length > 0 && questionType === 0 && (
-              <p className="question">
-                {
-                  questions.filter(item => item.correctAnswer === true)[0]
-                    .capital
-                }{" "}
-                is the capital of{" "}
-              </p>
-            )}
-            {questions.length > 0 && questionType === 1 && (
-              <>
-                <img
-                  src={
-                    questions.filter(item => item.correctAnswer === true)[0]
-                      .flag
-                  }
-                  alt=""
-                ></img>
-                <p className="question">
-                  Which country does this flag belong to?
-                </p>
-              </>
-            )}
-            {questions.map((item, index) => (
-              <QuestionField
-                key={item.id}
-                onClick={() => handleClick(index)}
-                position={item.position}
-                country={item.country}
-                clicked={item.clicked}
-                isAnswered={isQuestionAnswered}
-                correctAnswer={item.correctAnswer}
-              ></QuestionField>
-            ))}
-            {isQuestionAnswered && (
-              <div onClick={() => getNextQuestions()} className="next-button">
-                <p>Next</p>
-              </div>
-            )}
-          </QuestionBox>
-        )}
+  const getCorrectAnswer = questions =>
+    questions.filter(item => item.correctAnswer === true)[0];
 
-        {showResult && (
-          <QuestionBox showResult={showResult} questionType={questionType}>
-            <h1 className="country-quiz-text">Country Quiz</h1>
-            <Results className="results-svg"></Results>
-            <h2 className="results-text">Results</h2>
-            <p className="results-number">
-              You got <span className="results-number-text">{correctNum}</span>{" "}
-              correct answers
-            </p>
-            <button className="results-try-button" onClick={handleReset}>
-              Try again
-            </button>
-          </QuestionBox>
-        )}
-      </Container>
-    </>
+  const renderQuestion = (questions, questionType) => {
+    if (questions.length > 0) {
+      if (questionType === 0) {
+        return (
+          <p className="question">
+            {getCorrectAnswer(questions).capital + "is the capital of"}
+          </p>
+        );
+      } else {
+        return (
+          <>
+            <img src={getCorrectAnswer(questions).flag} alt=""></img>
+            <p className="question">Which country does this flag belong to?</p>
+          </>
+        );
+      }
+    }
+  };
+
+  return (
+    <Container>
+      {isLoading && <h1 className="Loading-text">Loading ...</h1>}
+      {!isLoading && !showResult && (
+        <QuestionBox showResult={showResult} questionType={questionType}>
+          <h1 className="country-quiz-text">Country Quiz</h1>
+          <Adventure className="adventure" />
+          {renderQuestion(questions, questionType)}
+          {questions.map((item, index) => (
+            <QuestionField
+              key={item.id}
+              onClick={() => handleClick(index)}
+              position={item.position}
+              country={item.country}
+              clicked={item.clicked}
+              isAnswered={isQuestionAnswered}
+              correctAnswer={item.correctAnswer}
+            ></QuestionField>
+          ))}
+          {isQuestionAnswered && (
+            <div onClick={() => getNextQuestions()} className="next-button">
+              <p>Next</p>
+            </div>
+          )}
+        </QuestionBox>
+      )}
+
+      {showResult && (
+        <QuestionBox showResult={showResult} questionType={questionType}>
+          <h1 className="country-quiz-text">Country Quiz</h1>
+          <Results className="results-svg"></Results>
+          <h2 className="results-text">Results</h2>
+          <p className="results-number">
+            You got <span className="results-number-text">{correctNum}</span>{" "}
+            correct answers
+          </p>
+          <button className="results-try-button" onClick={handleReset}>
+            Try again
+          </button>
+        </QuestionBox>
+      )}
+    </Container>
   );
 };
 
