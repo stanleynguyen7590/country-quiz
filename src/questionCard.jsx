@@ -1,6 +1,7 @@
 import styled from "styled-components";
 import axios from "axios";
 import background from "./assets/img/background.png";
+import GlobalStyle from "./globalStyle";
 import _ from "lodash";
 import { ReactComponent as Adventure } from "./assets/img/undraw_adventure_4hum 1.svg";
 import { ReactComponent as Results } from "./assets/img/undraw_winners_ao2o_2.svg";
@@ -140,7 +141,7 @@ const QuestionCard = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [allNations, setAllNations] = useState([]);
   const [isQuestionAnswered, setIsQuestionAnswered] = useState(false);
-  const [questions, setQuestions] = useState([]);
+  const [answers, setAnswers] = useState([]);
   const [isFinished, setIsFinished] = useState(false);
   const [showResult, setShowResult] = useState(false);
   const [questionType, setQuestionType] = useState(_.random(1));
@@ -155,13 +156,13 @@ const QuestionCard = () => {
         flag: item.flag,
       }));
       setAllNations(allNations);
-      setQuestions(c => getQuestions(allNations));
+      setAnswers(c => getNewAnswers(allNations));
     };
     fetchNations();
     setIsLoading(false);
   }, []);
 
-  const getQuestions = nations => {
+  const getNewAnswers = nations => {
     const correctAnswer = _.random(3);
     const selectedNations = _.shuffle(nations).slice(0, 4);
     const position = ["A", "B", "C", "D"];
@@ -176,20 +177,20 @@ const QuestionCard = () => {
     }));
   };
 
-  const handleClick = index => {
+  const chooseAnswer = index => {
     if (isQuestionAnswered) return;
-    const newQuestions = [...questions];
-    newQuestions[index].clicked = true;
-    setQuestions(newQuestions);
+    const newAnswers = [...answers];
+    newAnswers[index].clicked = true;
+    setAnswers(newAnswers);
     setIsQuestionAnswered(true);
-    if (index !== questions.findIndex(item => item.correctAnswer === true))
+    if (index !== answers.findIndex(item => item.correctAnswer === true))
       setIsFinished(true);
   };
 
   const getNextQuestion = () => {
     setQuestionType(_.random(1));
     if (!isFinished) {
-      setQuestions(c => getQuestions(allNations));
+      setAnswers(c => getNewAnswers(allNations));
       setIsQuestionAnswered(false);
       setNumberOfCorrectAnswers(c => c + 1);
     } else {
@@ -197,35 +198,36 @@ const QuestionCard = () => {
     }
   };
 
-  const handleReset = () => {
-    setQuestions(c => getQuestions(allNations));
+  const resetGame = () => {
+    setAnswers(c => getNewAnswers(allNations));
     setIsQuestionAnswered(false);
     setIsFinished(false);
     setShowResult(false);
     setNumberOfCorrectAnswers(0);
   };
 
-  const getCorrectAnswer = questions =>
-    questions.filter(item => item.correctAnswer === true)[0];
+  const getCorrectAnswer = answers =>
+    answers.filter(item => item.correctAnswer === true)[0];
 
   const renderQuestion = (questions, questionType) => {
-    if (questions.length > 0) {
+    if (answers.length > 0) {
       if (questionType === 0) {
         return (
           <p className="question">
-            {getCorrectAnswer(questions).capital + "is the capital of"}
+            {getCorrectAnswer(answers).capital + "is the capital of"}
           </p>
         );
       } else {
         return (
           <>
-            <img src={getCorrectAnswer(questions).flag} alt=""></img>
+            <img src={getCorrectAnswer(answers).flag} alt=""></img>
             <p className="question">Which country does this flag belong to?</p>
           </>
         );
       }
     }
   };
+
   const renderResult = () => (
     <QuestionBox showResult={showResult} questionType={questionType}>
       <h1 className="country-quiz-text">Country Quiz</h1>
@@ -236,41 +238,47 @@ const QuestionCard = () => {
         <span className="results-number-text">{numberOfCorrectAnswers}</span>{" "}
         correct answers
       </p>
-      <button className="results-try-button" onClick={handleReset}>
+      <button className="results-try-button" onClick={resetGame}>
         Try again
       </button>
     </QuestionBox>
   );
 
   return (
-    <Container>
-      {isLoading && <h1 className="Loading-text">Loading ...</h1>}
-      {!isLoading && !showResult && (
-        <QuestionBox showResult={showResult} questionType={questionType}>
-          <h1 className="country-quiz-text">Country Quiz</h1>
-          <Adventure className="adventure" />
-          {renderQuestion(questions, questionType)}
-          {questions.map((item, index) => (
-            <AnswerField
-              key={item.id}
-              onClick={() => handleClick(index)}
-              position={item.position}
-              country={item.country}
-              clicked={item.clicked}
-              isAnswered={isQuestionAnswered}
-              correctAnswer={item.correctAnswer}
-            ></AnswerField>
-          ))}
-          {isQuestionAnswered && (
-            <div onClick={() => getNextQuestion()} className="next-button">
-              <p>Next</p>
-            </div>
-          )}
-        </QuestionBox>
-      )}
-
-      {showResult && renderResult()}
-    </Container>
+    <>
+      <GlobalStyle></GlobalStyle>
+      <Container>
+        {isLoading && <h1 className="Loading-text">Loading ...</h1>}
+        {/* Render the questions box */}
+        {!isLoading && !showResult && (
+          <QuestionBox showResult={showResult} questionType={questionType}>
+            <h1 className="country-quiz-text">Country Quiz</h1>
+            <Adventure className="adventure" />
+            {renderQuestion(answers, questionType)}
+            {/* Render answer fields */}
+            {answers.map((item, index) => (
+              <AnswerField
+                key={item.id}
+                onClick={() => chooseAnswer(index)}
+                position={item.position}
+                country={item.country}
+                clicked={item.clicked}
+                isAnswered={isQuestionAnswered}
+                correctAnswer={item.correctAnswer}
+              ></AnswerField>
+            ))}
+            {/* Render the next button */}
+            {isQuestionAnswered && (
+              <div onClick={() => getNextQuestion()} className="next-button">
+                <p>Next</p>
+              </div>
+            )}
+          </QuestionBox>
+        )}
+        {/* Render results */}
+        {showResult && renderResult()}
+      </Container>
+    </>
   );
 };
 
